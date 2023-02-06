@@ -3,7 +3,6 @@
 #include <ctime>
 #include <chrono>
 #include <string>
-#include <unistd.h>
 #include <direct.h>
 
 class Logger
@@ -25,7 +24,6 @@ public:
             logfile<<"------------------------------------------"<<std::endl;
         }
     }
-
 
     template <typename T>
     void ilog(T info, std::string func_name = "")
@@ -72,7 +70,6 @@ public:
         logfile<<"------------------------------------------"<<std::endl;
     }
 
-
     ~Logger()
     {
         auto date_time = std::chrono::system_clock::now();
@@ -86,7 +83,7 @@ private:
     std::ofstream logfile;
 
     char buff[50]; 
-    std::string path = getcwd(buff, 100);
+    std::string path = _getcwd(buff, 100);
 
     std::string func_name; 
 };
@@ -95,6 +92,5 @@ int main()
 {
     Logger file;
     file.ilog("INFO LOG CREATED", "some_func");
-    file.elog("ERROR LOG CREATED", "other_func");
-    
+    file.elog("ERROR LOG CREATED", "other_func");    
 }
