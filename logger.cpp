@@ -4,6 +4,10 @@
 #include <chrono>
 #include <string>
 #include <direct.h>
+#include <mutex>
+#include <thread> 
+
+std::mutex mtx;
 
 class Logger
 {
@@ -14,14 +18,19 @@ public:
 
         if(!logfile.is_open())
         {
+            mtx.lock();
             std::cout<<"logfile is not open";
+            mtx.unlock();
         }
         else
         {
             auto date_time = std::chrono::system_clock::now();
             std::time_t log_time = std::chrono::system_clock::to_time_t(date_time);
+            mtx.lock();
             logfile<<"LOGFILE STARTED AT  "<<std::ctime(&log_time);
             logfile<<"------------------------------------------"<<std::endl;
+            mtx.unlock();
+
         }
     }
 
@@ -30,6 +39,7 @@ public:
     {
         auto date_time = std::chrono::system_clock::now();
         std::time_t log_time = std::chrono::system_clock::to_time_t(date_time);
+        mtx.lock();
         this->logfile << std::ctime(&log_time);
         this->logfile << path << std::endl;
         if(func_name != "")
@@ -38,6 +48,7 @@ public:
         }
         this->logfile<< "INFO"<< ":" << info << std::endl;
         logfile<<"------------------------------------------"<<std::endl;
+        mtx.unlock();
     }
 
     template <typename T>
@@ -45,6 +56,7 @@ public:
     {
         auto date_time = std::chrono::system_clock::now();
         std::time_t log_time = std::chrono::system_clock::to_time_t(date_time);
+        mtx.lock();
         this->logfile << std::ctime(&log_time);
         this->logfile << path << std::endl;
         if(func_name != "")
@@ -53,6 +65,7 @@ public:
         }
         this->logfile << "ERROR"<< ":" << info << std::endl;
         logfile<<"------------------------------------------"<<std::endl;
+        mtx.unlock();
     }
 
     template <typename T>
@@ -60,6 +73,7 @@ public:
     {
         auto date_time = std::chrono::system_clock::now();
         std::time_t log_time = std::chrono::system_clock::to_time_t(date_time);
+        mtx.lock();
         this->logfile << std::ctime(&log_time);
         this->logfile << path << std::endl;
         if(func_name != "")
@@ -68,14 +82,17 @@ public:
         }
         this->logfile<< "WARNING"<< ":" << info << std::endl;
         logfile<<"------------------------------------------"<<std::endl;
+        mtx.unlock();
     }
 
     ~Logger()
     {
         auto date_time = std::chrono::system_clock::now();
         std::time_t log_time = std::chrono::system_clock::to_time_t(date_time);
+        mtx.lock();
         this->logfile<<"logfile was closed at "<< std::ctime(&log_time);
         this->logfile<<"------------------------------------------"<<std::endl;
+        mtx.unlock();
         logfile.close();
     }
 
@@ -92,5 +109,5 @@ int main()
 {
     Logger file;
     file.ilog("INFO LOG CREATED", "some_func");
-    file.elog("ERROR LOG CREATED", "other_func");    
+    file.elog("ERROR LOG CREATED", "other_func");
 }
